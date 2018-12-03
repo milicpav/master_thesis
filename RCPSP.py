@@ -54,6 +54,8 @@ class RCPSP:
             if self.one_resource_only:
                 self.activity_resource = [[sum(lst)] for lst in self.activity_resource]
                 self.resource_available = [sum(self.resource_available)]
+                #self.activity_resource = [[lst[2]] for lst in self.activity_resource]
+                #self.resource_available = [self.resource_available[2]]
                 self.n_resources = 1
             if self.zero_rk:
                 for k in range(self.n_resources):
@@ -74,6 +76,7 @@ class RCPSP:
                      for i in range(self.n_activities) for j in self.activity_successor[i]), name = 'precedence')
         # (Optional): set start times before the earliest start time of an activity to 0
         pm.addConstrs(pm._v_ti[(t, i)] == 0 for i in range(self.n_activities) for t in range(0, self.activity_est[i]))
+        pm.setParam('OutputFlag', False)
         # Get the smallest possible project makespan
         pm.optimize()
         for t in range(self.T):
@@ -152,6 +155,7 @@ class RCPSP:
                             for t_ in range(max(0, t - self.activity_duration[i] + 1), t + 1) ])
                        <= resource_min[k]
                        for t in range(T) for k in range(self.n_resources)), name = 'res_req')
+        fm.setParam('OutputFlag', False)
         # Get the shortest makespan with no additional resources hired
         fm.optimize()
         for t in range(T):
